@@ -117,6 +117,11 @@ PRIVATE_KEY=YOUR_WALLET_PRIVATE_KEY
 yarn hardhat run scripts/deploy.js --network sepolia
 ```
 
+### 2️⃣ Sepolia Faucet でテスト ETH を取得
+1. [Sepolia Faucet](https://sepoliafaucet.com/) にアクセス。
+2. MetaMask のアドレスを入力し、ETH をリクエスト。
+3. 数分後にウォレットへ反映されることを確認。
+
 ---
 
 ## 📤 Vercel へのデプロイ
@@ -132,8 +137,8 @@ yarn hardhat run scripts/deploy.js --network sepolia
 ✅ Solidity の基本を Remix で学ぶ  
 ✅ Next.js でフロントエンドを構築  
 ✅ スマートコントラクトと連携  
-✅ Ethereum Testnet へデプロイ  
+✅ Ethereum Sepolia Testnet へデプロイ  
+✅ Faucet からテスト ETH を取得  
 ✅ Vercel でホスティング  
 
 質問や改善点があれば、Issue を作成してください！🚀
-
