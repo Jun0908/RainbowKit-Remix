@@ -110,11 +110,6 @@ export default function Home() {
 2. API キーを取得し `.env.local` に保存。
 ```sh
 ALCHEMY_API_URL=https://eth-sepolia.alchemyapi.io/v2/YOUR_API_KEY
-PRIVATE_KEY=YOUR_WALLET_PRIVATE_KEY
-```
-3. Hardhat または Foundry を使用してデプロイ。
-```sh
-yarn hardhat run scripts/deploy.js --network sepolia
 ```
 
 ### 2️⃣ Sepolia Faucet でテスト ETH を取得
