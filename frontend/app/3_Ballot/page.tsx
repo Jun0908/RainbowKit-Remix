@@ -1,130 +1,100 @@
 'use client'
 
-import * as React from "react"
-import { ArrowLeft, ArrowRight } from 'lucide-react'
-import Navbar from "@/components/header/navbar"
-import * as Progress from "@radix-ui/react-progress"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import * as React from "react";
+import { useState, useEffect } from "react";
+import { ethers } from "ethers";
+import Navbar from "@/components/header/navbar";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Loader2 } from "lucide-react";
+import Link from 'next/link';
 
-export default function Component() {
-  const [fidelity, setFidelity] = React.useState("")
-  const [alignment, setAlignment] = React.useState("")
+const contractAddress = "YOUR_CONTRACT_ADDRESS";
+const contractABI = [
+  {
+    "inputs": [],
+    "name": "getOwner",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "newOwner", "type": "address" }],
+    "name": "changeOwner",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+];
+
+export default function HomePage() {
+  const [owner, setOwner] = useState(null);
+  const [newOwner, setNewOwner] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchOwner = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      if (!window.ethereum) throw new Error("No crypto wallet found");
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const contract = new ethers.Contract(contractAddress, contractABI, provider);
+      const ownerAddress = await contract.getOwner();
+      setOwner(ownerAddress);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const changeOwner = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      if (!window.ethereum) throw new Error("No crypto wallet found");
+      await window.ethereum.request({ method: "eth_requestAccounts" });
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(contractAddress, contractABI, signer);
+      const transaction = await contract.changeOwner(newOwner);
+      await transaction.wait();
+      fetchOwner();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOwner();
+  }, []);
 
   return (
     <div className="min-h-screen bg-background p-4 flex items-center justify-center">
       <Navbar />
-      <Card className="w-full max-w-2xl">
-        <CardHeader className="space-y-2">
-          <div className="space-y-2">
-            <Progress.Root className="relative overflow-hidden bg-secondary h-2 w-full rounded-full">
-              <Progress.Indicator
-                className="bg-primary h-full w-full transition-all duration-500 ease-in-out rounded-full"
-                style={{ transform: `translateX(-${100 - 75}%)` }}
-              />
-            </Progress.Root>
-            <div className="text-sm text-muted-foreground">Step 3 of 4</div>
-          </div>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-2xl font-bold">Evaluating Quality</CardTitle>
-            <Button variant="default" className="bg-black hover:bg-black/90">
-              Verify Identity
-            </Button>
-          </div>
-          <CardDescription>
-            Incorporating Human Subjective Evaluation for Fidelity and Alignment
-          </CardDescription>
-          <p className="text-sm text-muted-foreground">
-            Combining FID with human evaluations addresses fidelity and alignment issues. Diverse panels of reviewers provide nuanced insights, helping models better align with cultural and contextual expectations. Studies indicate that incorporating human reviews can considerably improve alignment accuracy, ensuring reliable and relevant outputs.
-          </p>
+      <Card className="w-full max-w-md text-center">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold">Welcome to Owner DApp</CardTitle>
+          <CardDescription>Manage contract ownership on the blockchain.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold text-teal-500">Fidelity</CardTitle>
-                <CardDescription>
-                  Does the image look like an AI-generated photo or a real photo?
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <RadioGroup value={fidelity} onValueChange={setFidelity}>
-                  <div className="space-y-3">
-                    <Label className="flex items-center space-x-3">
-                      <RadioGroupItem value="1" />
-                      <span>1. AI-generated photo</span>
-                    </Label>
-                    <Label className="flex items-center space-x-3">
-                      <RadioGroupItem value="2" />
-                      <span>2. Probably an AI generated photo, but photorealistic</span>
-                    </Label>
-                    <Label className="flex items-center space-x-3">
-                      <RadioGroupItem value="3" />
-                      <span>3. Neutral</span>
-                    </Label>
-                    <Label className="flex items-center space-x-3">
-                      <RadioGroupItem value="4" />
-                      <span>4. Probably a real photo, but with irregular textures and shapes</span>
-                    </Label>
-                    <Label className="flex items-center space-x-3">
-                      <RadioGroupItem value="5" />
-                      <span>5. Real photo</span>
-                    </Label>
-                  </div>
-                </RadioGroup>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold text-teal-500">Alignment</CardTitle>
-                <CardDescription>
-                  How well does the image match the description?
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <RadioGroup value={alignment} onValueChange={setAlignment}>
-                  <div className="space-y-3">
-                    <Label className="flex items-center space-x-3">
-                      <RadioGroupItem value="1" />
-                      <span>1. Does not match at all</span>
-                    </Label>
-                    <Label className="flex items-center space-x-3">
-                      <RadioGroupItem value="2" />
-                      <span>2. Has significant discrepancies</span>
-                    </Label>
-                    <Label className="flex items-center space-x-3">
-                      <RadioGroupItem value="3" />
-                      <span>3. Has several minor discrepancies</span>
-                    </Label>
-                    <Label className="flex items-center space-x-3">
-                      <RadioGroupItem value="4" />
-                      <span>4. Has a few minor discrepancies</span>
-                    </Label>
-                    <Label className="flex items-center space-x-3">
-                      <RadioGroupItem value="5" />
-                      <span>5. Matches exactly</span>
-                    </Label>
-                  </div>
-                </RadioGroup>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="flex justify-between pt-4">
-            <Button variant="outline" className="w-24">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back
-            </Button>
-            <Button className="w-24 bg-[#6366F1] hover:bg-[#5558DD]">
-              Next
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </div>
+          <div className="text-lg font-semibold">Current Owner: {owner || "Fetching..."}</div>
+          <Input 
+            type="text" 
+            placeholder="Enter new owner address" 
+            value={newOwner} 
+            onChange={(e) => setNewOwner(e.target.value)}
+          />
+          <Button onClick={changeOwner} disabled={isLoading}>
+            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Change Owner
+          </Button>
+          {error && <div className="text-destructive text-sm">{error}</div>}
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
