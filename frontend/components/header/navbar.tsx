@@ -42,7 +42,7 @@ function Navbar() {
       {/* ロゴ */}
       <div style={boxStyle}>
         <img src="logo.png" alt="Logo" width={50} height={50} />
-        <span style={textStyle}>Nudibranch</span>
+        <span style={textStyle}>Practice</span>
       </div>
 
       {/* リンク */}
@@ -50,13 +50,6 @@ function Navbar() {
         <NextLink href="/landing" passHref legacyBehavior>
           <a style={linkStyle}>Demo</a>
         </NextLink>
-        <NextLink href="/evaluate-1" passHref legacyBehavior>
-          <a style={linkStyle}>Evaluate</a>
-        </NextLink>
-        <NextLink href="/synthesis-1" passHref legacyBehavior>
-          <a style={linkStyle}>Synthesis</a>
-        </NextLink>
-        
       </div>
 
       {/* Connectボタン */}
